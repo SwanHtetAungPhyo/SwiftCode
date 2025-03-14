@@ -1,0 +1,179 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SWIFT Code API By Swan Htet Aung Phyo",
+    "version": "1.0.0",
+    "description": "API for managing SWIFT codes, allowing retrieval, storage, and deletion of SWIFT-related data."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/v1"
+    }
+  ],
+  "paths": {
+    "/swift-codes/{swift-code}": {
+      "get": {
+        "summary": "Retrieve details of a single SWIFT code",
+        "parameters": [
+          {
+            "name": "swift-code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwiftCodeResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a SWIFT code",
+        "parameters": [
+          {
+            "name": "swift-code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SWIFT code deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/swift-codes/country/{countryISO2code}": {
+      "get": {
+        "summary": "Retrieve all SWIFT codes for a country",
+        "parameters": [
+          {
+            "name": "countryISO2code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountrySwiftCodesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/swift-codes": {
+      "post": {
+        "summary": "Add a new SWIFT code",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwiftCodeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "SWIFT code added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SwiftCodeResponse": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "string" },
+          "bankName": { "type": "string" },
+          "countryISO2": { "type": "string" },
+          "countryName": { "type": "string" },
+          "isHeadquarter": { "type": "boolean" },
+          "swiftCode": { "type": "string" },
+          "branches": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/BranchSwiftCode" }
+          }
+        }
+      },
+      "BranchSwiftCode": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "string" },
+          "bankName": { "type": "string" },
+          "countryISO2": { "type": "string" },
+          "isHeadquarter": { "type": "boolean" },
+          "swiftCode": { "type": "string" }
+        }
+      },
+      "CountrySwiftCodesResponse": {
+        "type": "object",
+        "properties": {
+          "countryISO2": { "type": "string" },
+          "countryName": { "type": "string" },
+          "swiftCodes": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/BranchSwiftCode" }
+          }
+        }
+      },
+      "SwiftCodeRequest": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "string" },
+          "bankName": { "type": "string" },
+          "countryISO2": { "type": "string" },
+          "countryName": { "type": "string" },
+          "isHeadquarter": { "type": "boolean" },
+          "swiftCode": { "type": "string" }
+        },
+        "required": ["swiftCode", "bankName", "countryISO2"]
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}

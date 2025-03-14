@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: app_db
+    restart: always
+    environment:
+      POSTGRES_USER: swanhtetaungphyo
+      POSTGRES_PASSWORD: swanhtet12
+      POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  app:
+    build: .
+    container_name: go_app
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: app_db
+      DB_PORT: 5432
+      DB_USER: swanhtetaungphyo
+      DB_PASSWORD: swanhtet12
+      DB_NAME: app_db
+    ports:
+      - "8080:8080"
+volumes:
+  postgres_data:
