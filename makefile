@@ -4,7 +4,7 @@ build:
 
 run:
 	@echo "Running the application..."
-	@go run ./cmd/main.go
+	@PORT=8080 DATA_PATH=./data/intern.csv go run main.go
 
 up:
 	@echo  "Docker compose up..."
@@ -19,6 +19,7 @@ git-sync:
 down:
 	@echo "Docker compose down..."
 	@docker compose down
+
 
 remove:
 	@docker rmi -r $(docker images -q)

@@ -5,7 +5,7 @@ RUN apk add --no-cache git
 COPY go.mod go.sum  ./
 COPY . .
 RUN go mod download
-RUN go build -o main ./cmd/main.go
+RUN go build -o main main.go
 
 FROM alpine:latest
 WORKDIR /app
@@ -13,7 +13,7 @@ COPY --from=builder /app/main .
 COPY ./data/intern.csv /app/data/intern.csv
 COPY ./makefile /app/makefile
 
-ENV PORT=8080
+ENV PORT=8081
 ENV DATA_PATH=/app/data/intern.csv
-EXPOSE 8080
+EXPOSE 8081
 CMD ["./main"]

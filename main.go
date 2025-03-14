@@ -7,6 +7,7 @@ import (
 	"github.com/SwanHtetAungPhyo/swifcode/internal/repo"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/routes"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/services"
+	_ "github.com/SwanHtetAungPhyo/swifcode/swagger/docs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -31,23 +32,27 @@ func main() {
 		log.Fatal("Failed to get DB instance")
 	}
 
-	go utils.InsertData(parsedData)
+	utils.InsertData(parsedData)
 
-	serviceInstanceForInject := services.NewSwiftCodeService(repo.DbInstance)
+	repoForInjection := repo.NewBankRepoMethodImpl(repo.DbInstance)
+	serviceInstanceForInject := services.NewSwiftCodeService(repoForInjection)
 	handlerInstance := handler.NewSwiftCodeHandlers(*serviceInstanceForInject)
 
 	routes.SetUpRoute(app, handlerInstance)
 
 	go func() {
 		logging.Logger.Info("Starting server", zap.String("address", "http://localhost:"+portNumber))
+
 		err := app.Listen(":" + portNumber)
 		if err != nil {
-			log.Fatal(err)
+			logging.Logger.Error("Error starting server", zap.Error(err))
+			log.Fatal("Error starting server")
 		}
+
 	}()
 
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	signal.Notify(signalChan, syscall.SIGTERM, syscall.SIGINT)
 	<-signalChan
 
 	logging.Logger.Info("Shutting down...")
@@ -62,10 +67,10 @@ func apiInit() *fiber.App {
 		ServerHeader: "SWIFT_CODE",
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
-		Prefork:      true,
+		Prefork:      false,
 	})
 	// rate limiting
-	appConfig.Use(limiter.Config{
+	appConfig.Use(limiter.New(limiter.Config{
 		Max:        30,
 		Expiration: 5 * time.Second,
 		LimitReached: func(c *fiber.Ctx) error {
@@ -73,12 +78,12 @@ func apiInit() *fiber.App {
 				"message": "too many requests",
 			})
 		},
-	})
+	}))
 	//
 	appConfig.Use(compress.New(
 		compress.Config{
 			Level: compress.LevelBestSpeed,
 		}))
-	
+
 	return appConfig
 }

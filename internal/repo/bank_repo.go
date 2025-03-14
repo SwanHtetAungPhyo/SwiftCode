@@ -2,6 +2,7 @@ package repo
 
 import (
 	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
+	"github.com/SwanHtetAungPhyo/swifcode/internal/pkg/logging"
 	"gorm.io/gorm"
 )
 
@@ -48,21 +49,25 @@ type BankRepoMethods interface {
 // @Description: Implement the  methods of the BankRepoMethod to interact with database
 type BankRepoMethodImpl struct {
 	BankRepoMethods  BankRepoMethods
-	databaseInstance *gorm.DB
+	DatabaseInstance *gorm.DB
 }
 
 // NewBankRepoMethodImpl
 //
 //	@Description: Create the new BankRepoMethodImpl to follow the dependency injection
-//	@param databaseInstance
-//	@return *BankRepoMethodImpl
+//	@return *BankRepoMethodImpl The implementation of the BankRepoMethod
 func NewBankRepoMethodImpl(databaseInstance *gorm.DB) *BankRepoMethodImpl {
 	return &BankRepoMethodImpl{
-		databaseInstance: databaseInstance,
+		DatabaseInstance: databaseInstance,
 	}
 }
 
 func (impl *BankRepoMethodImpl) Create(model *model.SwiftCode) error {
+	logging.Logger.Info("Create Swift Code")
+	if err := impl.DatabaseInstance.Create(model).Error; err != nil {
+		logging.Logger.Error("Create Swift Code Failed")
+		return err
+	}
 	return nil
 }
 func (impl *BankRepoMethodImpl) GetBySwiftCode(swiftCode string) (*model.SwiftCode, error) {

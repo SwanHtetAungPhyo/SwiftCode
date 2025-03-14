@@ -2,7 +2,7 @@ package services
 
 import (
 	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
-	"gorm.io/gorm"
+	"github.com/SwanHtetAungPhyo/swifcode/internal/repo"
 )
 
 // Service Layer to process the data manipulation, interact with repo (database layer) and cast the application logic to meet the Business Logic
@@ -45,31 +45,31 @@ type SwiftCodeService interface {
 // @Description:
 type SwiftCodeServiceImpl struct {
 	swiftCodeService SwiftCodeService
-	DB               *gorm.DB
+	swiftCodeRepo    *repo.BankRepoMethodImpl
 }
 
-func NewSwiftCodeService(db *gorm.DB) *SwiftCodeServiceImpl {
+func NewSwiftCodeService(repo *repo.BankRepoMethodImpl) *SwiftCodeServiceImpl {
 	return &SwiftCodeServiceImpl{
-		DB: db,
+		swiftCodeRepo: repo,
 	}
 }
 
 func (impl *SwiftCodeServiceImpl) GetBySwiftCode(swiftCode *model.SwiftCode) {
-	var swiftCodeModel model.SwiftCode
-	impl.DB.Where("swift_code = ?", swiftCode).First(&swiftCodeModel)
+	//var swiftCodeModel model.SwiftCode
+
 	return
 }
 
 func (impl *SwiftCodeServiceImpl) GetWithISO2(ISO2 string) []model.SwiftCode {
 	var swiftCode model.SwiftCode
 	var array []model.SwiftCode
-	impl.DB.First(&swiftCode, "country_iso2 = ?", ISO2)
+	//impl.DB.First(&swiftCode, "country_iso2 = ?", ISO2)
 	array = append(array, swiftCode)
 	return array
 }
 
 func (impl *SwiftCodeServiceImpl) Create(swiftCode *model.SwiftCode) {
-	impl.DB.Create(swiftCode)
+	//impl.DB.Create(swiftCode)
 }
 
 func (impl *SwiftCodeServiceImpl) Update(swiftCode *model.SwiftCode) *model.SwiftCode {
