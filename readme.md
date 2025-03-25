@@ -1,15 +1,15 @@
 
 # Swift Code Management System
 
-**Author**: Swan Htet Aung Phyo
+**Author**: Swan Htet Aung Phyo 
 
 ## Run
     
-    Clone this repo with 
+- Clone this repo with 
 
         git clone https://github.com/SwanHtetAungPhyo/SwiftCode.git
 
-    Makefile Run in the Project root dir 
+- Makefile Run in the Project root dir 
 
         make compose up 
 
