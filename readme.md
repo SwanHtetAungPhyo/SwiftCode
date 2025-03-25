@@ -5,10 +5,15 @@
 
 ## Run
     
-You will see the makefile
-    
-      make compose up 
+    Clone this repo with 
 
+        git clone https://github.com/SwanHtetAungPhyo/SwiftCode.git
+
+    Makefile Run in the Project root dir 
+
+        make compose up 
+
+    
 ## Solution Overview
 
 - **CSV Analysis & Parsing**:
