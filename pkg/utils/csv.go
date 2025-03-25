@@ -25,7 +25,6 @@ func loadCSV(path string, log *logrus.Logger) ([]model.SwiftCode, error) {
 	reader.TrimLeadingSpace = true
 	reader.ReuseRecord = true
 
-	// Skipping the header row
 	if _, err := reader.Read(); err != nil {
 		log.Error("Failed to read header", zap.Error(err))
 		return nil, err

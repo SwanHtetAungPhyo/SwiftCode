@@ -1,26 +1,31 @@
-package logging
+package logger
 
 import (
 	"github.com/sirupsen/logrus"
 	"os"
+	"sync"
 )
 
-var logger *logrus.Logger
+var (
+	logger *logrus.Logger
+	once   sync.Once
+)
 
 func Init() {
-	logger = logrus.New()
-
-	logger.SetOutput(os.Stdout)
-	logger.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp:             true,
-		PadLevelText:              true,
-		ForceColors:               true,
-		EnvironmentOverrideColors: true,
-		QuoteEmptyFields:          true,
-		TimestampFormat:           "2006-01-02 15:04:05",
+	once.Do(func() {
+		logger = logrus.New()
+		logger.SetOutput(os.Stdout)
+		logger.SetFormatter(&logrus.JSONFormatter{
+			TimestampFormat:   "2006-01-02 15:04:05",
+			DisableHTMLEscape: true,
+			PrettyPrint:       true,
+		})
 	})
 }
 
 func GetLogger() *logrus.Logger {
+	if logger == nil {
+		panic("Logger is not initialized. Call Init() before using GetLogger()")
+	}
 	return logger
 }

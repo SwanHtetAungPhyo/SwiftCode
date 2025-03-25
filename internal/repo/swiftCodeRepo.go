@@ -2,11 +2,13 @@ package repo
 
 import (
 	"errors"
+	"fmt"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
+// RepositoryMethods interface defines database operations
 type RepositoryMethods interface {
 	Create(req *model.SwiftCodeDto) error
 	GetBySwiftCode(swiftCode string) ([]model.SwiftCodeDto, error)
@@ -14,11 +16,16 @@ type RepositoryMethods interface {
 	Delete(swiftCode string) error
 }
 
+// Repository struct
 type Repository struct {
 	db      *gorm.DB
 	repoLog *logrus.Logger
 }
 
+// Ensure For Repository implements RepositoryMethods
+var _ RepositoryMethods = (*Repository)(nil)
+
+// NewRepository Constructor function
 func NewRepository(db *gorm.DB, repoLog *logrus.Logger) *Repository {
 	return &Repository{db: db, repoLog: repoLog}
 }
@@ -79,8 +86,12 @@ func (r *Repository) getOrCreateCountryID(tx *gorm.DB, countryISO2, countryName 
 }
 
 func (r *Repository) GetBySwiftCode(swiftCode string) ([]model.SwiftCodeDto, error) {
+	if len(swiftCode) < 8 {
+		return nil, errors.New("invalid swift code format")
+	}
+
+	swiftCodePrefix := fmt.Sprintf("%s%%", swiftCode[:8])
 	var bankDetails []model.BankDetails
-	swiftCodePrefix := swiftCode[:8] + "%"
 	if err := r.db.Where("swift_code LIKE ?", swiftCodePrefix).Find(&bankDetails).Error; err != nil {
 		r.repoLog.Errorln("Failed to fetch bank details:", err)
 		return nil, err
@@ -90,30 +101,17 @@ func (r *Repository) GetBySwiftCode(swiftCode string) ([]model.SwiftCodeDto, err
 		return nil, errors.New("no bank details found")
 	}
 
-	var country model.Country
-	if err := r.db.Where("id = ?", bankDetails[0].CountryID).First(&country).Error; err != nil {
-		r.repoLog.Errorln("Failed to fetch country:", err)
+	country, err := r.getCountryByBankDetails(bankDetails[0])
+	if err != nil {
 		return nil, err
 	}
 
-	var swiftCodeDtos []model.SwiftCodeDto
-	for _, b := range bankDetails {
-		swiftCodeDtos = append(swiftCodeDtos, model.SwiftCodeDto{
-			Address:       b.Address,
-			BankName:      b.Name,
-			CountryISO2:   country.CountryIso2Code,
-			CountryName:   country.Name,
-			IsHeadquarter: b.IsHeadquarter,
-			SwiftCode:     b.SwiftCode,
-		})
-	}
-	return swiftCodeDtos, nil
+	return convertToSwiftCodeDTOS(bankDetails, country), nil
 }
 
 func (r *Repository) GetByCountryISO(countryISO2 string) ([]model.BankDetails, *model.Country, error) {
-	var country model.Country
-	if err := r.db.Where("country_iso2_code = ?", countryISO2).First(&country).Error; err != nil {
-		r.repoLog.Errorln("Failed to fetch country:", err)
+	country, err := r.getCountryByISO(countryISO2)
+	if err != nil {
 		return nil, nil, err
 	}
 
@@ -122,7 +120,7 @@ func (r *Repository) GetByCountryISO(countryISO2 string) ([]model.BankDetails, *
 		r.repoLog.Errorln("Failed to fetch bank details:", err)
 		return nil, nil, err
 	}
-	return bankDetails, &country, nil
+	return bankDetails, country, nil
 }
 
 func (r *Repository) Delete(swiftCode string) error {

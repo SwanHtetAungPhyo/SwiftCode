@@ -5,11 +5,13 @@ import (
 	"errors"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/handler"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/middleware"
+	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/repo"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/routes"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/services"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,12 +19,13 @@ import (
 	"time"
 )
 
-func Start(port string, log *logrus.Logger) {
+func Start(port string, log *logrus.Logger, dbInstance *gorm.DB, isDevelopmentMode bool) {
 	log.Info("Initializing server components...")
 
 	app := apiEngineInit()
 	middleware.SetUp(app)
-	handlers := dependencyInjection(log)
+
+	handlers := dependencyInjection(log, dbInstance)
 	routes.SetUpRoute(app, handlers, log)
 
 	server := &http.Server{
@@ -39,20 +42,29 @@ func Start(port string, log *logrus.Logger) {
 		}
 	}()
 
-	shutdown(server, log)
+	if isDevelopmentMode {
+		shutdown(server, log, dbInstance, true)
+	} else {
+		shutdown(server, log, dbInstance, false)
+	}
 }
 
-func dependencyInjection(log *logrus.Logger) *handler.SwiftCodeHandlers {
+func dependencyInjection(log *logrus.Logger, db *gorm.DB) *handler.SwiftCodeHandlers {
 	log.Info("Initializing dependencies...")
-	repoService := repo.NewRepository(repo.DbInstance, log)
-	servicesImpl := services.NewService(repoService, log)
-	handlers := handler.NewSwiftCodeHandlers(servicesImpl, log)
+
+	repoInst := repo.NewRepository(db, log)
+	var repoMethods repo.RepositoryMethods = repoInst
+
+	serviceInst := services.NewService(repoMethods, log)
+	var serviceMethods services.ServiceMethods = serviceInst
+
+	handlers := handler.NewSwiftCodeHandlers(serviceMethods, log)
 
 	log.Info("Dependencies initialized successfully")
 	return handlers
 }
 
-func shutdown(server *http.Server, log logrus.FieldLogger) {
+func shutdown(server *http.Server, log logrus.FieldLogger, db *gorm.DB, isDevelopment bool) {
 	log.Info("Waiting for shutdown signal...")
 
 	osChan := make(chan os.Signal, 1)
@@ -67,8 +79,16 @@ func shutdown(server *http.Server, log logrus.FieldLogger) {
 		log.WithError(err).Fatal("Error during HTTP server shutdown")
 	}
 
-	if repo.DbInstance != nil {
-		sqlDB, err := repo.DbInstance.DB()
+	if isDevelopment {
+		err := db.Migrator().DropTable(&model.BankDetails{}, &model.Town{}, &model.Country{})
+		if err != nil {
+			log.WithError(err).Fatal("Error purging database table")
+			return
+		}
+	}
+
+	if db != nil {
+		sqlDB, err := db.DB()
 		if err != nil {
 			log.WithError(err).Error("Failed to retrieve database connection")
 		} else {

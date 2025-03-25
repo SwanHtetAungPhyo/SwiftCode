@@ -13,7 +13,5 @@ COPY --from=builder /app/main .
 COPY data/swif_codes.csv /app/data/intern.csv
 COPY ./makefile /app/makefile
 
-ENV PORT=8081
-ENV DATA_PATH=/app/data/intern.csv
-EXPOSE 8081
+EXPOSE 8080
 CMD ["./main"]

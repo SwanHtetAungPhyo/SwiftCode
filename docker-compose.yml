@@ -12,18 +12,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-
   app:
     build: .
     container_name: go_app
     depends_on:
       - postgres
     environment:
-      DB_HOST: app_db
-      DB_PORT: 5432
+      DB_HOST: postgres
+      DB_PORT:  5432
       DB_USER: swanhtetaungphyo
       DB_PASSWORD: swanhtet12
       DB_NAME: app_db
+      SSLMODE: disable
+      FILE_PATH: /app/data/intern.csv
+      MODE: development
     ports:
       - "8080:8080"
 

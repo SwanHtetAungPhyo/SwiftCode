@@ -1,13 +1,14 @@
 package services
 
 import (
+	"errors"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/repo"
 	"github.com/SwanHtetAungPhyo/swifcode/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
 
-type Methods interface {
+type ServiceMethods interface {
 	Create(req *model.SwiftCodeDto) error
 	GetBySwiftCode(swiftCode string) (*model.HeadquarterResponse, error)
 	GetByCountryISO(countryISO2Code string) (*model.CountryISO2Response, error)
@@ -15,11 +16,13 @@ type Methods interface {
 }
 
 type SwiftCodeServices struct {
-	repo   *repo.Repository
+	repo   repo.RepositoryMethods
 	logger *logrus.Logger
 }
 
-func NewService(repo *repo.Repository, logger *logrus.Logger) *SwiftCodeServices {
+var _ ServiceMethods = (*SwiftCodeServices)(nil)
+
+func NewService(repo repo.RepositoryMethods, logger *logrus.Logger) *SwiftCodeServices {
 	return &SwiftCodeServices{
 		repo:   repo,
 		logger: logger,
@@ -42,6 +45,22 @@ func (s *SwiftCodeServices) GetBySwiftCode(swiftCode string) (*model.Headquarter
 	if err != nil {
 		s.logger.Errorf("[Service] Error fetching Swift Code: %v", err)
 		return nil, err
+	}
+
+	if len(swiftCodes) == 0 {
+		s.logger.Errorf("[Service] Swift Code not found: %s", swiftCode)
+		return nil, errors.New("swift Code not found")
+	}
+	if len(swiftCodes) == 1 {
+		s.logger.Errorf("[Service] Found more than one Swift Code: %s", swiftCode)
+		return &model.HeadquarterResponse{
+			Address:       swiftCodes[0].Address,
+			SwiftCode:     swiftCodes[0].SwiftCode,
+			BankName:      swiftCodes[0].BankName,
+			CountryName:   swiftCodes[0].CountryName,
+			CountryISO2:   swiftCodes[0].CountryISO2,
+			IsHeadquarter: swiftCodes[0].IsHeadquarter,
+		}, nil
 	}
 
 	var headquarter model.SwiftCodeDto
