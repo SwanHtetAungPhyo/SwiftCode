@@ -1,0 +1,232 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the api to empower the bank system",
+        "title": "SwiftCode API",
+        "contact": {
+            "name": "API Support",
+            "email": "swanhtetaungp@gmail.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/v1/swift-codes": {
+            "post": {
+                "description": "Create a new Swift Code by providing a JSON payload",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SwiftCode"
+                ],
+                "summary": "Create a new Swift Code",
+                "parameters": [
+                    {
+                        "description": "Swift Code data",
+                        "name": "swiftCode",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SwiftCodeDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/swift-codes/country/{countryISO2code}": {
+            "get": {
+                "description": "Retrieve all Swift Codes for a specific country using the country ISO2 code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SwiftCode"
+                ],
+                "summary": "Fetch Swift Codes by Country ISO2 Code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Country ISO2 Code",
+                        "name": "countryISO2code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.SwiftCodeDto"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/swift-codes/{swift-code}": {
+            "get": {
+                "description": "Retrieve the Swift Code by providing the Swift Code identifier",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SwiftCode"
+                ],
+                "summary": "Fetch a Swift Code by its code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Swift Code",
+                        "name": "swift-code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a Swift Code by providing the Swift Code identifier",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SwiftCode"
+                ],
+                "summary": "Delete a Swift Code by its code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Swift Code",
+                        "name": "swift-code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.ApiResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.SwiftCodeDto": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "bankName": {
+                    "type": "string"
+                },
+                "countryISO2": {
+                    "type": "string"
+                },
+                "countryName": {
+                    "type": "string"
+                },
+                "isHeadquarter": {
+                    "type": "boolean"
+                },
+                "swiftCode": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

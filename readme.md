@@ -13,7 +13,9 @@
 
         make compose up 
 
-    
+## API documentation 
+
+![img.png](img.png)
 ## Solution Overview
 
 - **CSV Analysis & Parsing**:

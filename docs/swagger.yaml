@@ -1,0 +1,154 @@
+definitions:
+  model.ApiResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  model.SwiftCodeDto:
+    properties:
+      address:
+        type: string
+      bankName:
+        type: string
+      countryISO2:
+        type: string
+      countryName:
+        type: string
+      isHeadquarter:
+        type: boolean
+      swiftCode:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: swanhtetaungp@gmail.com
+    name: API Support
+  description: This is the api to empower the bank system
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: SwiftCode API
+  version: "1.0"
+paths:
+  /v1/swift-codes:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Swift Code by providing a JSON payload
+      parameters:
+      - description: Swift Code data
+        in: body
+        name: swiftCode
+        required: true
+        schema:
+          $ref: '#/definitions/model.SwiftCodeDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+      summary: Create a new Swift Code
+      tags:
+      - SwiftCode
+  /v1/swift-codes/{swift-code}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Swift Code by providing the Swift Code identifier
+      parameters:
+      - description: Swift Code
+        in: path
+        name: swift-code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+      summary: Delete a Swift Code by its code
+      tags:
+      - SwiftCode
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the Swift Code by providing the Swift Code identifier
+      parameters:
+      - description: Swift Code
+        in: path
+        name: swift-code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+      summary: Fetch a Swift Code by its code
+      tags:
+      - SwiftCode
+  /v1/swift-codes/country/{countryISO2code}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all Swift Codes for a specific country using the country
+        ISO2 code
+      parameters:
+      - description: Country ISO2 Code
+        in: path
+        name: countryISO2code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.SwiftCodeDto'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+      summary: Fetch Swift Codes by Country ISO2 Code
+      tags:
+      - SwiftCode
+swagger: "2.0"

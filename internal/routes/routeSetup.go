@@ -1,20 +1,18 @@
 package routes
 
 import (
+	_ "github.com/SwanHtetAungPhyo/swifcode/docs"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func SetUpRoute(router *gin.Engine, handlers handler.Methods, log *logrus.Logger) {
 	log.Info("Setting up routes...")
 	log.Infof("API Documentation can be found on the path: %s", "http://127.0.0.1:8080/swagger/index.html")
-
-	router.GET("/hello", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello World",
-		})
-	})
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	crudroutes := router.Group("/v1/swift-codes")
 	crudroutes.GET("/:swift-code", handlers.GetBySwiftCode)
 	crudroutes.POST("/", handlers.Create)
