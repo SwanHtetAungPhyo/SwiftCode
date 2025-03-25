@@ -1,10 +1,10 @@
 ###Retrieve details of a single SWIFT code whether for a headquarters or branches
-GET http://localhost:8080/v1/swift-codes/
+GET http://localhost:8081/v1/swift-codes/
 Content-Type:  application/json
 
 
 ### GET with the countryISO2Code
-GET http://localhost:8080/v1/swift-codes/country/AL
+GET http://localhost:8081/v1/swift-codes/country/AL
 Content-Type: application/json
 
 ###

@@ -2,108 +2,105 @@ package handler
 
 import (
 	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
-	"github.com/SwanHtetAungPhyo/swifcode/internal/pkg/converter"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/services"
-	"github.com/SwanHtetAungPhyo/swifcode/internal/validation"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"net/http"
 )
 
-// SwiftCodeHandlerInterface defines the methods to handle Swift code requests.
-type SwiftCodeHandlerInterface interface {
-	Get(c *fiber.Ctx) error
-	GetWithISO2(c *fiber.Ctx) error
-	Create(c *fiber.Ctx) error
-	Delete(c *fiber.Ctx) error
+type Methods interface {
+	Create(c *gin.Context)
+	GetBySwiftCode(c *gin.Context)
+	GetByCountryISO2Code(c *gin.Context)
+	DeleteBySwiftCode(c *gin.Context)
 }
 
-// SwiftCodeHandlers holds the instance of service layer and implements the handler interface.
 type SwiftCodeHandlers struct {
-	serviceLayerInstance services.SwiftCodeServiceImpl
+	srvInst    *services.SwiftCodeServices
+	handlerLog *logrus.Logger
 }
 
-// NewSwiftCodeHandlers initializes the handlers with a service instance.
-func NewSwiftCodeHandlers(serviceLayerInstance services.SwiftCodeServiceImpl) *SwiftCodeHandlers {
-	return &SwiftCodeHandlers{serviceLayerInstance: serviceLayerInstance}
-}
-
-// Get retrieves the SwiftCode based on a query parameter.
-// @Summary Get SwiftCode
-// @Description Retrieve a SwiftCode by its code.
-// @Tags SwiftCode
-// @Accept json
-// @Produce json
-// @Param swift-code query string true "SwiftCode"
-// @Success 200 {object} model.SwiftCode
-// @Failure 400 {object} model.ErrorResponse
-// @Router /swift-code [get]
-func (impl *SwiftCodeHandlers) Get(c *fiber.Ctx) error {
-	swiftCode := c.Query("swift-code")
-	if swiftCode == "" || len(swiftCode) <= 11 || len(swiftCode) >= 8 {
-		return handleErrorResponse(c, fiber.StatusBadRequest, "swift-code is required")
+func NewSwiftCodeHandlers(ser *services.SwiftCodeServices, handlerLog *logrus.Logger) *SwiftCodeHandlers {
+	return &SwiftCodeHandlers{
+		srvInst:    ser,
+		handlerLog: handlerLog,
 	}
-	return nil
 }
 
-// GetWithISO2 retrieves SwiftCodes based on a country ISO2 code.
-// @Summary Get Banks by ISO2
-// @Description Retrieve banks using the ISO2 country code.
-// @Tags SwiftCode
-// @Produce json
-// @Param countryISO2code path string true "Country ISO2 Code"
-// @Success 200 {object} []model.SwiftCode
-// @Failure 400 {object} model.ErrorResponse
-// @Router /swift-code/{countryISO2code} [get]
-func (impl *SwiftCodeHandlers) GetWithISO2(c *fiber.Ctx) error {
-	countryISO2 := c.Params("countryISO2code")
-	if countryISO2 == "" {
-		return handleErrorResponse(c, fiber.StatusBadRequest, "countryISO2code is required")
+func (s *SwiftCodeHandlers) Create(c *gin.Context) {
+	s.handlerLog.Info("Received request to create Swift Code")
+	var swiftCode model.SwiftCodeDto
+	if err := c.ShouldBindJSON(&swiftCode); err != nil {
+		s.handlerLog.WithError(err).Error("Failed to bind Swift Code request")
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request format"})
+		return
 	}
-	data := impl.serviceLayerInstance.GetWithISO2(countryISO2)
-	return c.JSON(data)
-}
 
-// Create creates a new SwiftCode entry.
-// @Summary Create SwiftCode
-// @Description Create a new SwiftCode entry.
-// @Tags SwiftCode
-// @Accept json
-// @Produce json
-// @Param request body model.SwiftCodeAddRequest true "SwiftCode Add Request"
-// @Success 201 {object} model.SwiftCode
-// @Failure 400 {object} model.ErrorResponse
-// @Router /swift-code [post]
-func (impl *SwiftCodeHandlers) Create(c *fiber.Ctx) error {
-	var request model.SwiftCodeAddRequest
-	if err := c.BodyParser(&request); err != nil {
-		return handleErrorResponse(c, fiber.StatusBadRequest, "Invalid request body")
+	if err := s.srvInst.Create(&swiftCode); err != nil {
+		s.handlerLog.WithError(err).Error("Failed to create Swift Code")
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create Swift Code"})
+		return
 	}
-	if err := validation.ValidateCreateRequest(request); err != nil {
-		return handleErrorResponse(c, fiber.StatusBadRequest, err.Error())
+
+	s.handlerLog.Info("Swift Code created successfully")
+	c.JSON(http.StatusCreated, gin.H{"message": "Swift Code created successfully"})
+}
+
+func (s *SwiftCodeHandlers) GetBySwiftCode(c *gin.Context) {
+	s.handlerLog.Info("Received request to fetch Swift Code")
+	swiftCode := c.Param("swift-code")
+	if swiftCode == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Swift Code is required"})
+		return
 	}
-	newSwiftCode := converter.ConvertToSwiftCodeModel(request)
-	impl.serviceLayerInstance.Create(newSwiftCode)
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "SwiftCode created successfully",
-	})
+
+	resp, err := s.srvInst.GetBySwiftCode(swiftCode)
+	if err != nil {
+		s.handlerLog.WithError(err).Error("Failed to fetch Swift Code")
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch Swift Code"})
+		return
+	}
+
+	s.handlerLog.Info("Swift Code fetched successfully")
+	c.JSON(http.StatusOK, resp)
 }
 
-// Delete deletes a SwiftCode entry.
-// @Summary Delete SwiftCode
-// @Description Delete a SwiftCode by its value.
-// @Tags SwiftCode
-// @Accept json
-// @Produce json
-// @Param swift-code query string true "Swift Code"
-// @Success 200 {object} model.SwiftCode
-// @Failure 400 {object} model.ErrorResponse
-// @Router /swift-code [delete]
-func (impl *SwiftCodeHandlers) Delete(c *fiber.Ctx) error {
-	return nil // This method would be implemented later.
+func (s *SwiftCodeHandlers) GetByCountryISO2Code(c *gin.Context) {
+	s.handlerLog.Info("Received request to fetch Swift Codes by country ISO2")
+	iso2Code := c.Param("countryISO2code")
+	if iso2Code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Country ISO2 Code is required"})
+		return
+	}
+
+	resp, err := s.srvInst.GetByCountryISO(iso2Code)
+	if err != nil {
+		s.handlerLog.WithError(err).Error("Failed to fetch Swift Codes for country")
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch Swift Codes for country"})
+		return
+	}
+
+	s.handlerLog.Info("Swift Codes for country fetched successfully")
+	c.JSON(http.StatusOK, resp)
 }
 
-// Helper function to handle errors and return consistent responses.
-func handleErrorResponse(c *fiber.Ctx, status int, message string) error {
-	return c.Status(status).JSON(fiber.Map{
-		"error": message,
+func (s *SwiftCodeHandlers) DeleteBySwiftCode(c *gin.Context) {
+	s.handlerLog.Info("Received request to delete Swift Code")
+	swiftCode := c.Param("swift-code")
+	if swiftCode == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Swift Code is required"})
+		return
+	}
+
+	if err := s.srvInst.Delete(swiftCode); err != nil {
+		s.handlerLog.WithError(err).Error("Failed to delete Swift Code")
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to delete Swift Code"})
+		return
+	}
+
+	s.handlerLog.Infof("Swift Code %s deleted successfully", swiftCode)
+	c.JSON(http.StatusOK, gin.H{
+		"message":      "Swift Code deleted successfully",
+		"deleted_code": swiftCode,
 	})
 }

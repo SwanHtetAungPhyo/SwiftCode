@@ -1,0 +1,28 @@
+### DELETE Trying to delete the record by swift code
+DELETE  http://localhost:8080/v1/swift-codes/TETEMTM1XXX
+Content-Type:  application/json
+
+
+### GET GET By swiftcode
+GET http://localhost:8080/v1/swift-codes/BCHICLRMXXX
+Accept: application/json
+Content-Type: application/json
+
+###
+GET http://localhost:8080/v1/swift-codes/country/PL
+Accept: application/json
+Content-Type: application/json
+
+### POST
+POST  http://localhost:8080/v1/swift-codes
+Accept: application/json
+Content-Type: application/json
+
+{
+  "address": "STRZEGOMSKA 42C  WROCLAW, DOLNOSLASKIE, 53-611",
+  "bankName": "BANCO DE CHILE",
+  "countryISO2": "CL",
+  "countryName": "CHILE",
+  "isHeadquarter": false,
+  "swiftCode": "TETEMTM1XXX"
+}

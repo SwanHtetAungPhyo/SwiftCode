@@ -1,6 +1,8 @@
 package converter
 
-import "github.com/SwanHtetAungPhyo/swifcode/internal/model"
+import (
+	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
+)
 
 func ConvertToSwiftCodeModel(request model.SwiftCodeAddRequest) *model.SwiftCode {
 	return &model.SwiftCode{

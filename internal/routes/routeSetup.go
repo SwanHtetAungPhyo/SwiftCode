@@ -2,21 +2,21 @@ package routes
 
 import (
 	"github.com/SwanHtetAungPhyo/swifcode/internal/handler"
-	"github.com/SwanHtetAungPhyo/swifcode/internal/pkg/logging"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/monitor"
-	"github.com/gofiber/swagger"
-	"go.uber.org/zap"
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
-func SetUpRoute(app *fiber.App, handlers *handler.SwiftCodeHandlers) {
-	logging.Logger.Info("SetUpRoute", zap.String("app", app.MountPath()))
-	app.Get("/swagger/*", swagger.HandlerDefault)
-	apiVersioning := app.Group("/v1/swift-codes")
-	apiVersioning.Get("/", handlers.Get)
-	apiVersioning.Get("/country/:countryISO2code", handlers.GetWithISO2)
-	apiVersioning.Post("/", handlers.Create)
-	apiVersioning.Delete("/", handlers.Delete)
+func SetUpRoute(router *gin.Engine, handlers *handler.SwiftCodeHandlers, log *logrus.Logger) {
+	log.Info("Setting up routes...")
+	log.Infof("API Documentation can be found on the path: %s", "http://127.0.0.1:8080/swagger/index.html")
 
-	app.Get("/metrics", monitor.New())
+	crudroutes := router.Group("/v1/swift-codes")
+	crudroutes.GET("/:swift-code", handlers.GetBySwiftCode)
+	crudroutes.POST("/", handlers.Create)
+	crudroutes.DELETE("/:swift-code", handlers.DeleteBySwiftCode)
+	crudroutes.GET("/country/:countryISO2code", handlers.GetByCountryISO2Code)
+	for _, route := range router.Routes() {
+		log.Infof("Method: %s, Path: %s", route.Method, route.Path)
+	}
 }
+func dependencyInjection() {}

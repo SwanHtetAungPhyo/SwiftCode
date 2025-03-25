@@ -1,16 +1,16 @@
 package test
 
 import (
-	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
-	"github.com/SwanHtetAungPhyo/swifcode/internal/pkg/logging"
-	"github.com/SwanHtetAungPhyo/swifcode/internal/validation"
+	"github.com/SwanHtetAungPhyo/swifcode/app/internal/model"
+	"github.com/SwanHtetAungPhyo/swifcode/app/internal/validation"
+	"github.com/SwanHtetAungPhyo/swifcode/internal/pkg/log"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest"
 	"testing"
 )
 
 func TestValidateCreateRequest(t *testing.T) {
-	logging.Logger = zaptest.NewLogger(t)
+	log.Logger = zaptest.NewLogger(t)
 
 	type test struct {
 		name     string
