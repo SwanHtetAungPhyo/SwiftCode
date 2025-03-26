@@ -23,7 +23,7 @@ func Start(port string, log *logrus.Logger, dbInstance *gorm.DB, isDevelopmentMo
 	log.Info("Initializing server components...")
 
 	app := apiEngineInit()
-	middleware.SetUp(app)
+	middleware.SetUp(app, log)
 
 	handlers := dependencyInjection(log, dbInstance)
 	routes.SetUpRoute(app, handlers, log)

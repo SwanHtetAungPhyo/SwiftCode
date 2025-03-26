@@ -30,7 +30,7 @@
     - **Repository Layer**: Manages database CRUD operations
   - Implemented dependency injection pattern
   - Utilized Go interfaces for loose coupling
-
+  - Cache: I used cache to store the data that cannot be modified frequently like get  swiftcodes by both swift code and country iso 2 code
 - **Resilience Features**:
   - Database connection retry mechanism
   - Configuration-based development
@@ -95,6 +95,11 @@ CREATE TABLE bank_details (
 );
 ```
 
+## API response before and after of using cache
+ 
+I used the framework built in cache because I don't want external dependency like redis
+
+![img_1.png](img_1.png)
 ### Key Features
 - **Normalization**:
     - Achieved 3NF (Third Normal Form)
