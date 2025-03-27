@@ -1,4 +1,4 @@
-package test
+package swiftcode_test
 
 import (
 	config2 "github.com/SwanHtetAungPhyo/swifcode/internal/config"

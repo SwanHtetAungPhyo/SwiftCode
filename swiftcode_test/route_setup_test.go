@@ -1,8 +1,8 @@
-package test
+package swiftcode_test
 
 import (
 	"github.com/SwanHtetAungPhyo/swifcode/internal/routes"
-	"github.com/SwanHtetAungPhyo/swifcode/internal/test/mocks"
+	"github.com/SwanHtetAungPhyo/swifcode/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"

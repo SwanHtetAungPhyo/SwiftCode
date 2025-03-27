@@ -1,10 +1,10 @@
-package test
+package swiftcode_test
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/SwanHtetAungPhyo/swifcode/internal/test/mocks"
+	"github.com/SwanHtetAungPhyo/swifcode/mocks"
 	"net/http"
 	"net/http/httptest"
 	"testing"
