@@ -6,11 +6,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.uber.org/zap"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
 func LoadCSV(path string, log *logrus.Logger) ([]model.SwiftCode, error) {
-	file, err := os.Open(path)
+	file, err := os.Open(filepath.Join(path))
 	if err != nil {
 		log.Error("Failed to open file", zap.String("path", path), zap.Error(err))
 		return nil, err

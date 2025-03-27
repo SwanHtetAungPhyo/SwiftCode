@@ -90,7 +90,7 @@ func setupService(t *testing.T) (*services.SwiftCodeServices, func()) {
 	//defer clean()
 	log := logrus.New()
 	processor := services.NewBankProcessor(instance, log)
-	processor.ProcessData("data/swift_codes.csv")
+	processor.ProcessData("../data/swift_codes.csv")
 
 	repo := repo2.NewRepository(instance, log)
 	service := services.NewService(repo, log)
