@@ -22,9 +22,8 @@ func SetUpRoute(router *gin.Engine, handlers handler.Methods, log *logrus.Logger
 	cacheStore := persistence.NewInMemoryStore(time.Minute)
 
 	crudroutes := router.Group("/v1/swift-codes")
-	// This Routes are cached cuz they are the data that cannot be modified frequently so that I can reduce the IO operation on Database
-	crudroutes.GET("/:swift-code", cache.CachePage(
-		cacheStore, time.Minute*5, handlers.GetBySwiftCode))
+	// These Routes are cached cuz they are the data that cannot be modified frequently so that I can reduce the IO operation on Database
+	crudroutes.GET("/:swift-code", cache.CachePage(cacheStore, time.Minute*5, handlers.GetBySwiftCode))
 	crudroutes.GET("/country/:countryISO2code", cache.CachePage(cacheStore, time.Minute*5, handlers.GetByCountryISO2Code))
 
 	crudroutes.POST("/", handlers.Create)

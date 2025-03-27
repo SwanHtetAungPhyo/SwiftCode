@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/repo"
+	"github.com/SwanHtetAungPhyo/swifcode/pkg/custom_errors"
 	"github.com/SwanHtetAungPhyo/swifcode/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
@@ -102,8 +103,8 @@ func (s *SwiftCodeServices) GetByCountryISO(countryISO2Code string) (*model.Coun
 			IsHeadquarter: value.IsHeadquarter,
 		})
 	}
-
 	s.logger.Infof("[Service] Successfully fetched Swift Codes for country: %s", countryISO2Code)
+
 	return &model.CountryISO2Response{
 		CountryISO2: country.CountryIso2Code,
 		CountryName: country.Name,
@@ -113,10 +114,17 @@ func (s *SwiftCodeServices) GetByCountryISO(countryISO2Code string) (*model.Coun
 
 func (s *SwiftCodeServices) Delete(swiftCode string) error {
 	s.logger.Infof("[Service] Deleting Swift Code: %s", swiftCode)
-	if err := s.repo.Delete(swiftCode); err != nil {
+
+	err := s.repo.Delete(swiftCode)
+	if errors.Is(err, custom_errors.ErrSwiftCodeNotFound) {
+		s.logger.Errorf("[Service] Swift Code not found: %s", swiftCode)
+		return custom_errors.ErrSwiftCodeNotFound
+	}
+	if err != nil {
 		s.logger.Errorf("[Service] Failed to delete Swift Code %s: %v", swiftCode, err)
 		return err
 	}
+
 	s.logger.Infof("[Service] Successfully deleted Swift Code: %s", swiftCode)
 	return nil
 }

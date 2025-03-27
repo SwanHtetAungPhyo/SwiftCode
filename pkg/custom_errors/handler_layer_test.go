@@ -1,4 +1,4 @@
-package swiftcode_test
+package custom_errors_test
 
 import (
 	"bytes"
@@ -116,54 +116,10 @@ func TestGetBySwiftCode_Success(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-//func TestGetBySwiftCode_NotFound(t *testing.T) {
-//	router, mockService := setupRouter()
-//
-//	mockService.On("GetBySwiftCode", "MISSING456").Return(nil, errors.New("not found")).Once()
-//
-//	req, _ := http.NewRequest("GET", "/v1/swift-codes/MISSING456", nil)
-//	w := httptest.NewRecorder()
-//
-//	router.ServeHTTP(w, req)
-//
-//	assert.Equal(t, http.StatusNotFound, w.Code)
-//	assert.JSONEq(t, `{"message":"Failed to fetch Swift Code"}`, w.Body.String())
-//	mockService.AssertExpectations(t)
-//}
-//
-//func TestGetByCountryISO2Code_Success(t *testing.T) {
-//	router, mockService := setupRouter()
-//
-//	expected := []model.SwiftCode{
-//		{
-//			Address:       "123 Example St",
-//			SwiftCode:     "TESTUS33",
-//			BankName:      "Test Bank",
-//			CountryISO2:   "US",
-//			CountryName:   "United States",
-//			IsHeadquarter: true,
-//		},
-//	}
-//
-//	testISO := "US"
-//	mockService.On("GetByCountryISO", testISO).Return(expected, nil).Once()
-//
-//	req, _ := http.NewRequest("GET", "/v1/swift-codes/country/"+testISO, nil)
-//	w := httptest.NewRecorder()
-//
-//	router.ServeHTTP(w, req)
-//
-//	expectedJSON, _ := json.Marshal(expected)
-//
-//	assert.Equal(t, http.StatusOK, w.Code)
-//	assert.JSONEq(t, string(expectedJSON), w.Body.String())
-//	mockService.AssertExpectations(t)
-//}
-
 func TestGetByCountryISO2Code_MissingParameter(t *testing.T) {
 	mockService := new(mocks.MockServiceMethods)
 	log := logrus.New()
-	handler := handler.NewSwiftCodeHandlers(mockService, log)
+	handlers := handler.NewSwiftCodeHandlers(mockService, log)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -171,7 +127,7 @@ func TestGetByCountryISO2Code_MissingParameter(t *testing.T) {
 		{Key: "countryISO2code", Value: ""},
 	}
 
-	handler.GetByCountryISO2Code(c)
+	handlers.GetByCountryISO2Code(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	assert.JSONEq(t, `{"message":"Country ISO2 Code is required"}`, w.Body.String())

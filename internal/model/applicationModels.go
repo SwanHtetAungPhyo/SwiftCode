@@ -25,7 +25,7 @@ type SwiftCodeDto struct {
 	Address       string `json:"address,omitempty"`
 	BankName      string `json:"bankName"`
 	CountryISO2   string `json:"countryISO2"`
-	CountryName   string `json:"countryName"`
+	CountryName   string `json:"countryName,omitempty"`
 	IsHeadquarter bool   `json:"isHeadquarter"`
 	SwiftCode     string `json:"swiftCode"`
 }

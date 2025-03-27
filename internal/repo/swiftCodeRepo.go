@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
+	"github.com/SwanHtetAungPhyo/swifcode/pkg/custom_errors"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -129,10 +130,17 @@ func (r *Repository) Delete(swiftCode string) error {
 		return tx.Error
 	}
 
-	if err := tx.Where("swift_code = ?", swiftCode).Delete(&model.SwiftCodeModel{}).Error; err != nil {
+	result := tx.Where("swift_code = ?", swiftCode).Delete(&model.SwiftCodeModel{})
+	if result.Error != nil {
 		tx.Rollback()
-		r.repoLog.Errorln("Failed to delete bank details:", err)
-		return err
+		r.repoLog.Errorln("Failed to delete bank details:", result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		tx.Rollback()
+		r.repoLog.Errorln("Swift Code not found:", swiftCode)
+		return custom_errors.ErrSwiftCodeNotFound
 	}
 
 	return tx.Commit().Error
