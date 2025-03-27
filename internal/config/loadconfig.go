@@ -25,7 +25,7 @@ func LoadConfig() *AppConfiguration {
 	dbName := getEnv("DB_NAME", "app_db")
 	port := getEnv("PORT", "8080")
 	sslMode := getEnv("SSLMODE", "disable")
-	filePath := getEnv("FILE_PATH", "/Users/swanhtet1aungphyo/IdeaProjects/SwiftCode/data/swif_codes.csv")
+	filePath := getEnv("FILE_PATH", "/Users/swanhtet1aungphyo/IdeaProjects/SwiftCode/data/swift_codes.csv")
 	mode := getEnv("MODE", "development")
 	return &AppConfiguration{
 		DbHost:   dbHost,

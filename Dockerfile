@@ -10,7 +10,7 @@ RUN go build -o main main.go
 FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/main .
-COPY data/swif_codes.csv /app/data/intern.csv
+COPY data/swift_codes.csv /app/data/intern.csv
 COPY ./makefile /app/makefile
 
 EXPOSE 8080
