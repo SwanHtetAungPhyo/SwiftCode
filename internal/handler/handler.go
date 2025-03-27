@@ -160,8 +160,6 @@ func (s *SwiftCodeHandlers) DeleteBySwiftCode(c *gin.Context) {
 		return
 	}
 
-	cacheKey := "/v1/swift-codes/" + swiftCode
-	err = cachestore.Delete(cacheKey)
 	if err != nil {
 		s.HandlerLog.WithError(err).Error("Failed to delete Swift Code")
 	}

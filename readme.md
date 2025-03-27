@@ -95,11 +95,7 @@ CREATE TABLE bank_details (
 );
 ```
 
-## API response before and after of using cache
- 
-I used the framework built in cache because I don't want external dependency like redis
 
-![img_1.png](img_1.png)
 ### Key Features
 - **Normalization**:
     - Achieved 3NF (Third Normal Form)
