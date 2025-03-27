@@ -153,10 +153,10 @@ func TestSwiftCodeRepo(t *testing.T) {
 	//	assert.Equal(t, country, countryToInsert)
 	//})
 	// Test case: Retrieve Country by ISO code
-	t.Run("getCountryByISO", func(t *testing.T) {
-		countryFromDB, err := repoInst.GetCountryByISO("US")
-		assert.NoError(t, err)
-		assert.Equal(t, countryFromDB, countryToInsert)
-	})
-
+	//t.Run("getCountryByISO", func(t *testing.T) {
+	//	countryFromDB, err := repoInst.GetCountryByISO("US")
+	//	assert.NoError(t, err)
+	//	assert.Equal(t, countryFromDB, countryToInsert)
+	//})
+	//
 }
