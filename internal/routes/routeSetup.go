@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/cache"
 	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -21,7 +22,6 @@ func SetUpRoute(router *gin.Engine, handlers handler.Methods, log *logrus.Logger
 	cacheStore := persistence.NewInMemoryStore(time.Minute)
 
 	crudroutes := router.Group("/v1/swift-codes")
-
 	// This Routes are cached cuz they are the data that cannot be modified frequently so that I can reduce the IO operation on Database
 	crudroutes.GET("/:swift-code", cache.CachePage(
 		cacheStore, time.Minute*5, handlers.GetBySwiftCode))
@@ -29,6 +29,7 @@ func SetUpRoute(router *gin.Engine, handlers handler.Methods, log *logrus.Logger
 
 	crudroutes.POST("/", handlers.Create)
 	crudroutes.DELETE("/:swift-code", handlers.DeleteBySwiftCode)
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	for _, route := range router.Routes() {
 		log.Infof("Method: %s, Path: %s", route.Method, route.Path)

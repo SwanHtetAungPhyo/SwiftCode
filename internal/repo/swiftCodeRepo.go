@@ -12,7 +12,7 @@ import (
 type RepositoryMethods interface {
 	Create(req *model.SwiftCodeDto) error
 	GetBySwiftCode(swiftCode string) ([]model.SwiftCodeDto, error)
-	GetByCountryISO(countryISO2 string) ([]model.BankDetails, *model.Country, error)
+	GetByCountryISO(countryISO2 string) ([]model.SwiftCodeModel, *model.Country, error)
 	Delete(swiftCode string) error
 }
 
@@ -49,7 +49,7 @@ func (r *Repository) Create(req *model.SwiftCodeDto) error {
 		return err
 	}
 
-	bankDetails := model.BankDetails{
+	bankDetails := model.SwiftCodeModel{
 		Address:       req.Address,
 		Name:          req.BankName,
 		SwiftCode:     req.SwiftCode,
@@ -91,7 +91,7 @@ func (r *Repository) GetBySwiftCode(swiftCode string) ([]model.SwiftCodeDto, err
 	}
 
 	swiftCodePrefix := fmt.Sprintf("%s%%", swiftCode[:8])
-	var bankDetails []model.BankDetails
+	var bankDetails []model.SwiftCodeModel
 	if err := r.db.Where("swift_code LIKE ?", swiftCodePrefix).Find(&bankDetails).Error; err != nil {
 		r.repoLog.Errorln("Failed to fetch bank details:", err)
 		return nil, err
@@ -101,7 +101,7 @@ func (r *Repository) GetBySwiftCode(swiftCode string) ([]model.SwiftCodeDto, err
 		return nil, errors.New("no bank details found")
 	}
 
-	country, err := r.getCountryByBankDetails(bankDetails[0])
+	country, err := r.GetCountryByBankDetails(bankDetails[0])
 	if err != nil {
 		return nil, err
 	}
@@ -109,13 +109,13 @@ func (r *Repository) GetBySwiftCode(swiftCode string) ([]model.SwiftCodeDto, err
 	return convertToSwiftCodeDTOS(bankDetails, country), nil
 }
 
-func (r *Repository) GetByCountryISO(countryISO2 string) ([]model.BankDetails, *model.Country, error) {
-	country, err := r.getCountryByISO(countryISO2)
+func (r *Repository) GetByCountryISO(countryISO2 string) ([]model.SwiftCodeModel, *model.Country, error) {
+	country, err := r.GetCountryByISO(countryISO2)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var bankDetails []model.BankDetails
+	var bankDetails []model.SwiftCodeModel
 	if err := r.db.Where("country_id = ?", country.ID).Find(&bankDetails).Error; err != nil {
 		r.repoLog.Errorln("Failed to fetch bank details:", err)
 		return nil, nil, err
@@ -129,7 +129,7 @@ func (r *Repository) Delete(swiftCode string) error {
 		return tx.Error
 	}
 
-	if err := tx.Where("swift_code = ?", swiftCode).Delete(&model.BankDetails{}).Error; err != nil {
+	if err := tx.Where("swift_code = ?", swiftCode).Delete(&model.SwiftCodeModel{}).Error; err != nil {
 		tx.Rollback()
 		r.repoLog.Errorln("Failed to delete bank details:", err)
 		return err

@@ -1,4 +1,4 @@
-package utils
+package test
 
 import (
 	utils2 "github.com/SwanHtetAungPhyo/swifcode/pkg/utils"
@@ -48,7 +48,7 @@ func TestLoadCSV(t *testing.T) {
 			failOnErrTesting(t, err)
 		}
 	}(tempFilePath)
-	data, err := utils2.loadCSV(tempFilePath, logger)
+	data, err := utils2.LoadCSV(tempFilePath, logger)
 	if err != nil {
 		failOnErrTesting(t, err)
 	}

@@ -1,4 +1,4 @@
-package loadConfig_test
+package test
 
 import (
 	config2 "github.com/SwanHtetAungPhyo/swifcode/internal/config"

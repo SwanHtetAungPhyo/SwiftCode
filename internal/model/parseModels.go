@@ -41,14 +41,15 @@ type Town struct {
 	UpdatedAt time.Time
 }
 
-type BankDetails struct {
+type SwiftCodeModel struct {
 	ID            int `gorm:"primaryKey;autoIncrement"`
 	Name          string
 	Address       string
-	SwiftCode     string `gorm:"size:11"`
+	SwiftCode     string `gorm:"unique;size:11"`
 	IsHeadquarter bool
 	CountryID     int `gorm:"index"`
 	TownNameId    int `gorm:"index"`
+	CodeType      string
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }
@@ -68,6 +69,6 @@ type BankDto struct {
 	CountryIso2Code string
 }
 
-func (Country) TableName() string     { return "countries" }
-func (Town) TableName() string        { return "towns" }
-func (BankDetails) TableName() string { return "bank_details" }
+func (Country) TableName() string        { return "countries" }
+func (Town) TableName() string           { return "towns" }
+func (SwiftCodeModel) TableName() string { return "swiftcodes" }

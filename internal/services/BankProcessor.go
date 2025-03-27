@@ -49,7 +49,7 @@ func (b *BankProcessor) migrateModels() error {
 	return b.db.AutoMigrate(
 		&model.Country{},
 		&model.Town{},
-		&model.BankDetails{},
+		&model.SwiftCodeModel{},
 	)
 }
 
@@ -159,7 +159,7 @@ func (b *BankProcessor) processBanks(
 	townIDMap map[string]int,
 ) error {
 	bankDtos := extractUniqueBanks(data)
-	var banks []model.BankDetails
+	var banks []model.SwiftCodeModel
 
 	for _, dto := range bankDtos {
 		countryID, exists := countryMap[dto.CountryIso2Code]
@@ -175,7 +175,7 @@ func (b *BankProcessor) processBanks(
 			continue
 		}
 
-		banks = append(banks, model.BankDetails{
+		banks = append(banks, model.SwiftCodeModel{
 			Name:          dto.Name,
 			Address:       dto.Address,
 			SwiftCode:     dto.SwiftCode,

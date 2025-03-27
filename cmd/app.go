@@ -80,7 +80,7 @@ func shutdown(server *http.Server, log logrus.FieldLogger, db *gorm.DB, isDevelo
 	}
 
 	if isDevelopment {
-		err := db.Migrator().DropTable(&model.BankDetails{}, &model.Town{}, &model.Country{})
+		err := db.Migrator().DropTable(&model.SwiftCodeModel{}, &model.Town{}, &model.Country{})
 		if err != nil {
 			log.WithError(err).Fatal("Error purging database table")
 			return

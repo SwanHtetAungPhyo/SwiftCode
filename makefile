@@ -20,6 +20,9 @@ down:
 	@echo "Docker compose down..."
 	@docker compose down
 
+test:
+	@echo  "testing..."s
+	@go test -v ./internal/test
 
 remove:
 	@docker rmi -r $(docker images -q)

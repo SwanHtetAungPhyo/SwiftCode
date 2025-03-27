@@ -19,8 +19,10 @@ var (
 func Init(log *logrus.Logger, cfg *config.AppConfiguration) {
 	once.Do(func() {
 		log.Info("Initializing database connection...")
-		dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
-			cfg.DbHost, cfg.DbPort, cfg.DbName, cfg.DbUser, cfg.DbPass, cfg.SSLMODE)
+		//dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
+		//	cfg.DbHost, cfg.DbPort, cfg.DbName, cfg.DbUser, cfg.DbPass, cfg.SSLMODE)
+		dsn := fmt.Sprintf("host=%s port=%s dbname=%s",
+			cfg.DbHost, cfg.DbPort, cfg.DbName)
 		var err error
 		for i := 0; i < 5; i++ {
 			instance, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})

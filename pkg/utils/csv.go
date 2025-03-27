@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func loadCSV(path string, log *logrus.Logger) ([]model.SwiftCode, error) {
+func LoadCSV(path string, log *logrus.Logger) ([]model.SwiftCode, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Error("Failed to open file", zap.String("path", path), zap.Error(err))
@@ -72,7 +72,7 @@ func IsHeadquarter(swiftCode string) bool {
 }
 
 func Parse(path string, log *logrus.Logger) []model.SwiftCode {
-	data, err := loadCSV(path, log)
+	data, err := LoadCSV(path, log)
 	if err != nil {
 		log.Fatal("Failed to load CSV", zap.String("path", path), zap.Error(err))
 	}

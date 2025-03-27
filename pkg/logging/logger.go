@@ -20,6 +20,7 @@ func Init() {
 			DisableHTMLEscape: true,
 			PrettyPrint:       true,
 		})
+
 	})
 }
 
