@@ -15,12 +15,16 @@ func SetUpRoute(router *gin.Engine, handlers handler.Methods, log *logrus.Logger
 	log.Info("Setting up routes...")
 	log.Infof("API Documentation can be found on the path: %s", "http://127.0.0.1:8080/swagger/index.html")
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	crudroutes := router.Group("/v1/swift-codes")
+
+	//Main routes
 	crudroutes.GET("/:swift-code", handlers.GetBySwiftCode)
 	crudroutes.GET("/country/:countryISO2code", handlers.GetByCountryISO2Code)
-
 	crudroutes.POST("/", handlers.Create)
 	crudroutes.DELETE("/:swift-code", handlers.DeleteBySwiftCode)
+
+	//For prometheus
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})

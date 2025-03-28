@@ -4,6 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"sync"
+	"testing"
+
 	"github.com/SwanHtetAungPhyo/swifcode/internal/handler"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
 	repo2 "github.com/SwanHtetAungPhyo/swifcode/internal/repo"
@@ -12,10 +17,6 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"sync"
-	"testing"
 )
 
 var dummyData = model.CountryISO2Response{
@@ -128,6 +129,9 @@ func sendRequest(t *testing.T, router *gin.Engine, method, url string, body inte
 	router.ServeHTTP(w, req)
 	return w
 }
+
+// TestCreateSwiftCode tests the creation of a Swift Code.
+// It includes scenarios for missing body, invalid country, and empty fields.
 func TestCreateSwiftCode(t *testing.T) {
 	service, clean := setupService(t)
 	defer clean()
@@ -153,7 +157,7 @@ func TestCreateSwiftCode(t *testing.T) {
 
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 		assert.Equal(t, "The country does not exist. If you want, you need to insert the new country and ISO2 code first", apiResponse.Message)
-		
+
 	})
 	t.Run("EmptyBody", func(t *testing.T) {
 		modelWithEmptyField := model.SwiftCodeDto{
@@ -171,6 +175,9 @@ func TestCreateSwiftCode(t *testing.T) {
 		fmt.Println(w.Code)
 	})
 }
+
+// TestGetBySwiftCode tests the retrieval of a Swift Code by its code.
+// It includes scenarios for successful retrieval, non-existent Swift Code, malformed Swift Code, and concurrent access
 func TestGetBySwiftCode(t *testing.T) {
 	service, _ := setupService(t)
 	router := setupRouters(service)
@@ -216,6 +223,9 @@ func TestGetBySwiftCode(t *testing.T) {
 		wg.Wait()
 	})
 }
+
+// TestGetByCountryISO2 tests the retrieval of Swift Codes by a country ISO2 code.
+// It includes scenarios for invalid ISO2 code input and successful retrieval.
 func TestGetByCountryISO2(t *testing.T) {
 	service, _ := setupService(t)
 	router := setupRouters(service)
@@ -245,6 +255,8 @@ func TestGetByCountryISO2(t *testing.T) {
 	})
 }
 
+// TestDeleteBySwiftCode tests the deletion of a Swift Code by its code.
+// It includes scenarios for successful deletion, non-existent Swift Code, and malformed Swift Code.
 func TestDeleteBySwiftCode(t *testing.T) {
 	service, _ := setupService(t)
 	router := setupRouters(service)

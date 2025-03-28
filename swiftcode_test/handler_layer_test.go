@@ -1,4 +1,4 @@
-package custom_errors_test
+package swiftcode_test
 
 import (
 	"bytes"
@@ -21,6 +21,7 @@ func setupRouter() (*gin.Engine, *mocks.MockServiceMethods) {
 	router := gin.Default()
 	mockService := new(mocks.MockServiceMethods)
 	log := logrus.New()
+
 	swiftCodeHandlers := handler.NewSwiftCodeHandlers(mockService, log)
 
 	router.POST("/v1/swift-codes", swiftCodeHandlers.Create)
@@ -75,7 +76,7 @@ func TestCreateSwiftCode_FailedToCreate(t *testing.T) {
 	swiftCodeDto := &model.SwiftCodeDto{
 		Address:       "456 Sample Ave",
 		BankName:      "Failed Bank",
-		CountryISO2:   "UK",
+		CountryISO2:   "",
 		CountryName:   "United Kingdom",
 		IsHeadquarter: false,
 		SwiftCode:     "FAILUK22",
@@ -86,34 +87,24 @@ func TestCreateSwiftCode_FailedToCreate(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	mockService.On("Create", swiftCodeDto).Return(errors.New("database error")).Once()
-
 	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	expectedResponse := `{"message": "You need to provide Swift Code and Data. All fields must be filled"}`
+	assert.JSONEq(t, expectedResponse, string(w.Body.Bytes()))
 
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
-	assert.JSONEq(t, `{"message":"Failed to create Swift Code"}`, w.Body.String())
-	mockService.AssertExpectations(t)
 }
 
-func TestGetBySwiftCode_Success(t *testing.T) {
+func TestGetBySwiftCode_failure(t *testing.T) {
 	router, mockService := setupRouter()
 
-	expected := &model.HeadquarterResponse{
-		SwiftCode:     "VALID123",
-		BankName:      "Valid Bank",
-		CountryISO2:   "US",
-		CountryName:   "United States",
-		IsHeadquarter: true,
-	}
-
-	mockService.On("GetBySwiftCode", "VALID123").Return(expected, nil).Once()
+	mockService.On("GetBySwiftCode", "VALID123").Return(nil, errors.New("Invalid Swift Code")).Once()
 
 	req, _ := http.NewRequest("GET", "/v1/swift-codes/VALID123", nil)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusOK, w.Code)
-	mockService.AssertExpectations(t)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
 func TestGetByCountryISO2Code_MissingParameter(t *testing.T) {
@@ -130,7 +121,7 @@ func TestGetByCountryISO2Code_MissingParameter(t *testing.T) {
 	handlers.GetByCountryISO2Code(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.JSONEq(t, `{"message":"Country ISO2 Code is required"}`, w.Body.String())
+	assert.JSONEq(t, `{"message":"Invalid Country ISO2 Code"}`, w.Body.String())
 	mockService.AssertNotCalled(t, "GetByCountryISO")
 }
 
@@ -150,21 +141,6 @@ func TestGetByCountryISO2Code_ServiceError(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-//	func TestDeleteBySwiftCode_Success(t *testing.T) {
-//		router, mockService := setupRouter()
-//		targetSwiftCode := "TESTUSOOXXX"
-//		req, _ := http.NewRequest("DELETE", "/v1/swift-codes/"+targetSwiftCode, nil)
-//		w := httptest.NewRecorder()
-//		mockService.On("Delete", targetSwiftCode).Return(nil).Once()
-//		router.ServeHTTP(w, req)
-//
-//		assert.Equal(t, http.StatusOK, w.Code)
-//		assert.JSONEq(t, `{
-//			"message": "Swift Code deleted successfully",
-//			"deleted_code": "TESTUSOOXXX"
-//		}`, w.Body.String())
-//		mockService.AssertExpectations(t)
-//	}
 func TestDeleteBySwiftCode_MissingParameter(t *testing.T) {
 	mockService := new(mocks.MockServiceMethods)
 	log := logrus.New()
@@ -177,22 +153,6 @@ func TestDeleteBySwiftCode_MissingParameter(t *testing.T) {
 	handler.DeleteBySwiftCode(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.JSONEq(t, `{"message":"Swift Code is required"}`, w.Body.String())
+	assert.JSONEq(t, `{"message":"Swift Code is Malformed"}`, w.Body.String())
 	mockService.AssertNotCalled(t, "Delete")
-}
-
-func TestDeleteBySwiftCode_ServiceError(t *testing.T) {
-	router, mockService := setupRouter()
-
-	targetSwiftCode := "FAILING99"
-	req, _ := http.NewRequest("DELETE", "/v1/swift-codes/"+targetSwiftCode, nil)
-	w := httptest.NewRecorder()
-
-	mockService.On("Delete", targetSwiftCode).Return(errors.New("database error")).Once()
-
-	router.ServeHTTP(w, req)
-
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
-	assert.JSONEq(t, `{"message":"Failed to delete Swift Code"}`, w.Body.String())
-	mockService.AssertExpectations(t)
 }

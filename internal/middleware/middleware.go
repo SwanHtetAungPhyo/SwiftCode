@@ -87,8 +87,15 @@ func ResponseTimeMiddleware(log *logrus.Logger) gin.HandlerFunc {
 // It includes response time logging, CORS, recovery, logger, and Prometheus metrics.
 func SetUp(router *gin.Engine, log *logrus.Logger) {
 	router.Use(ResponseTimeMiddleware(log)) // Logs response times for each request.
-	router.Use(cors.Default())              // Enables default CORS handling.
-	router.Use(gin.Recovery())              // Recovers from panics to prevent server crashes.
-	router.Use(gin.Logger())                // Logs each HTTP request.
-	router.Use(PrometheusMetrics())         // Tracks request durations and counts for Prometheus.
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+	router.Use(gin.Recovery())      // Recovers from panics to prevent server crashes.
+	router.Use(gin.Logger())        // Logs each HTTP request.
+	router.Use(PrometheusMetrics()) // Tracks request durations and counts for Prometheus.
 }
