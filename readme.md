@@ -42,6 +42,11 @@ Here's the revised version with improved grammar:
 - Please refer to the API documentation available in the Swagger UI.
 - If you would like to perform a load test, visit [http://localhost:9090/targets](http://localhost:9090/targets), which will redirect you to the Prometheus UI.
 - For visualization, log in to Grafana with "admin" as both the username and password. Then, add the data source as [http://prometheus:9090](http://prometheus:9090) and run queries such as `http_request_totals` for the instance name "app" and `http_duration` for latency testing.
+  - Perform the unit test and integration test with 
+     ```
+    - make test # or 
+    - go test ./swfitcode_test
+    ```
 
 ---
 
