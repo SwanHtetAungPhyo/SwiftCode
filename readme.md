@@ -49,6 +49,7 @@ Here's the revised version with improved grammar:
     ```
     
 - Some of the bank has no address(eg . BSCHCLRMXXX), so , address field will be omitted
+- You can check the CI/CD by running the .gitwork flow on your local 
 
 ---
 
