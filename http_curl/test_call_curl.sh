@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 curl -X GET "http://localhost:8080/v1/swift-codes/country/PL" | jq . > ./result_json/response_get_by_country.json
 
-curl -X GET "http://localhost:8080/v1/swift-codes/BMDNPLP1XXX" | jq . > ./result_json/response_get_by_swift_code.json
+curl -X GET "http://localhost:8080/v1/swift-codes/BSCHCLRMXXX" | jq . > ./result_json/response_get_by_swift_code.json
 
 curl -X POST "http://localhost:8080/v1/swift-codes" \
 -H "Content-Type: application/json" \

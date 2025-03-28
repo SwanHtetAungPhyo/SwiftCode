@@ -47,6 +47,8 @@ Here's the revised version with improved grammar:
     - make test # or 
     - go test ./swfitcode_test
     ```
+    
+- Some of the bank has no address(eg . BSCHCLRMXXX), so , address field will be omitted
 
 ---
 

@@ -68,6 +68,9 @@ func (s *SwiftCodeServices) GetBySwiftCode(swiftCode string) (*model.Headquarter
 			break
 		}
 	}
+	for i := range swiftCodes {
+		swiftCodes[i].CountryName = ""
+	}
 
 	s.logger.Infof("[Service] Found Headquarter: %s", headquarter.Address)
 	return &model.HeadquarterResponse{

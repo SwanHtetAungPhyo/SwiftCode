@@ -1,8 +1,16 @@
 {
-  "address": "ZEROMSKIEGO 75  RADOM, MAZOWIECKIE, 26-600",
-  "bankName": "DNB BANK POLSKA SPOLKA AKCYJNA",
-  "countryISO2": "PL",
-  "countryName": "POLAND",
+  "bankName": "BANCO SANTANDER CHILE",
+  "countryISO2": "CL",
+  "countryName": "CHILE",
   "isHeadquarter": true,
-  "swiftCode": "BMDNPLP1XXX"
+  "swiftCode": "BSCHCLRMXXX",
+  "branches": [
+    {
+      "bankName": "BANCO SANTANDER CHILE",
+      "countryISO2": "CL",
+      "countryName": "CHILE",
+      "isHeadquarter": false,
+      "swiftCode": "BSCHCLRMGST"
+    }
+  ]
 }
