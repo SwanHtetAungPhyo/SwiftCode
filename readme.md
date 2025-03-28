@@ -12,6 +12,7 @@
 ### Clone the Repository
 
 ```bash
+
 git clone https://github.com/SwanHtetAungPhyo/SwiftCode.git
 ```
 
@@ -20,6 +21,7 @@ git clone https://github.com/SwanHtetAungPhyo/SwiftCode.git
 Use the Makefile in the project root directory:
 
 ```bash
+
 make up       ## To run the application 
 make test     ## To run the test 
 make down     ## To bring down the docker compose
@@ -27,6 +29,21 @@ make down     ## To bring down the docker compose
 ## If you have Go installed locally, please view the documentation of the code
 pkgsite -http=:6060
 ```
+
+Here's the revised version with improved grammar:
+
+---
+
+**Application Flow:**
+
+- When you run the application with the `docker-compose up` command or `make up`:
+  - The application will load data from the CSV, parse it, and insert it into the already normalized database.
+- After the data is loaded, you can test the application by visiting [http://localhost:8080/v1/swift-codes](http://localhost:8080/v1/swift-codes).
+- Please refer to the API documentation available in the Swagger UI.
+- If you would like to perform a load test, visit [http://localhost:9090/targets](http://localhost:9090/targets), which will redirect you to the Prometheus UI.
+- For visualization, log in to Grafana with "admin" as both the username and password. Then, add the data source as [http://prometheus:9090](http://prometheus:9090) and run queries such as `http_request_totals` for the instance name "app" and `http_duration` for latency testing.
+
+---
 
 ### Instruction to Run the Application
 
