@@ -2,6 +2,7 @@ package model
 
 import "time"
 
+// DetailsDto For CSV parsing and data preparation
 type DetailsDto struct {
 	Name            string
 	Address         string
@@ -10,6 +11,8 @@ type DetailsDto struct {
 	IsHeadquarter   bool
 	CountryIso2Code string
 }
+
+// Details For CSV parsing and data preparation
 type Details struct {
 	Name            string
 	Address         string
@@ -20,10 +23,13 @@ type Details struct {
 	CountryId       int
 }
 
+// TownNameDto For CSV parsing and data preparation
 type TownNameDto struct {
 	TownName    string
 	CountryName string
 }
+
+// Country for gorm model
 type Country struct {
 	ID              int    `gorm:"primaryKey;autoIncrement"`
 	CountryIso2Code string `gorm:"unique;size:2"`
@@ -33,6 +39,7 @@ type Country struct {
 	UpdatedAt       time.Time
 }
 
+// Town for gorm model
 type Town struct {
 	ID        int `gorm:"primaryKey;autoIncrement"`
 	Name      string
@@ -41,6 +48,7 @@ type Town struct {
 	UpdatedAt time.Time
 }
 
+// SwiftCodeModel for the gorm model
 type SwiftCodeModel struct {
 	ID            int `gorm:"primaryKey;autoIncrement"`
 	Name          string
@@ -54,12 +62,13 @@ type SwiftCodeModel struct {
 	UpdatedAt     time.Time
 }
 
-// DTOs for data processing
+// TownDto TownDTOs for data processing to be ready to insert to town table
 type TownDto struct {
 	TownName        string
 	CountryIso2Code string
 }
 
+// BankDto for data processing to be ready to insert to swift-code table
 type BankDto struct {
 	Name            string
 	Address         string

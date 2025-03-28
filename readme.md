@@ -43,8 +43,7 @@
     - **Repository Layer:** Manages database CRUD operations.
   - Implemented dependency injection.
   - Utilized Go interfaces for loose coupling.
-  - **Cache:** Used cache to store data that does not change frequently (e.g., swift codes by both swift code and country ISO2 code).
-
+  
 - **Resilience Features:**
   - Database connection retry mechanism.
   - Configuration-based development.

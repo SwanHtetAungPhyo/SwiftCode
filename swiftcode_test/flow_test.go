@@ -3,6 +3,7 @@ package swiftcode_test
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/handler"
 	"github.com/SwanHtetAungPhyo/swifcode/internal/model"
 	repo2 "github.com/SwanHtetAungPhyo/swifcode/internal/repo"
@@ -135,21 +136,39 @@ func TestCreateSwiftCode(t *testing.T) {
 		w := sendRequest(t, router, http.MethodPost, "/v1/swift-codes", nil)
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
-	t.Run("WithBody", func(t *testing.T) {
+	t.Run("WithBodyFailed cuz of non existed country", func(t *testing.T) {
 		w := sendRequest(t, router, http.MethodPost, "/v1/swift-codes", &model.SwiftCodeDto{
 			Address:       "Krakow",
 			BankName:      "Santander Banks",
 			SwiftCode:     "KRAKOWDDXXX",
-			CountryISO2:   "PL",
+			CountryISO2:   "MM",
 			CountryName:   "POLAND",
 			IsHeadquarter: true,
 		})
-		assert.Equal(t, http.StatusCreated, w.Code)
+		var apiResponse model.ApiResponse
+		err := json.Unmarshal(w.Body.Bytes(), &apiResponse)
+		if err != nil {
+			t.Fatalf("Failed to unmarshal response body: %v", err)
+		}
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		assert.Equal(t, "The country does not exist. If you want, you need to insert the new country and ISO2 code first", apiResponse.Message)
+		
 	})
 	t.Run("EmptyBody", func(t *testing.T) {
-		w := sendRequest(t, router, http.MethodPost, "/v1/swift-codes", &model.SwiftCodeDto{})
+		modelWithEmptyField := model.SwiftCodeDto{
+			Address:       "",
+			BankName:      "",
+			SwiftCode:     "",
+			CountryISO2:   "",
+			CountryName:   "",
+			IsHeadquarter: true,
+		}
+		w := sendRequest(t, router, http.MethodPost, "/v1/swift-codes", modelWithEmptyField)
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 		assert.Contains(t, w.Body.String(), "You need to provide Swift Code and Data")
+		fmt.Println(w.Body.String())
+		fmt.Println(w.Code)
 	})
 }
 func TestGetBySwiftCode(t *testing.T) {

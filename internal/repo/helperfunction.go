@@ -2,7 +2,7 @@ package repo
 
 import "github.com/SwanHtetAungPhyo/swifcode/internal/model"
 
-// Helper functions For the repository Layer
+// GetCountryByBankDetails Helper functions For the repository Layer
 func (r *Repository) GetCountryByBankDetails(bd model.SwiftCodeModel) (*model.Country, error) {
 	var country model.Country
 	if err := r.db.Where("id = ?", bd.CountryID).First(&country).Error; err != nil {

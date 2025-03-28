@@ -14,6 +14,7 @@ type SwiftCode struct {
 	Timezone      string `gorm:"not null" json:"timezone"`
 }
 
+// CountryISO2Response represent the api response for the getByCountryISO2Code
 type CountryISO2Response struct {
 	CountryISO2 string         `json:"countryISO2"`
 	CountryName string         `json:"countryName"`
