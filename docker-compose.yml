@@ -1,8 +1,10 @@
+
+
 services:
   postgres:
     image: postgres:16-alpine
     container_name: app_db
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: swanhtetaungphyo
       POSTGRES_PASSWORD: swanhtet12
@@ -11,6 +13,13 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bridge
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swanhtetaungphyo -d app_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   prometheus:
     image: prom/prometheus
@@ -19,6 +28,11 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+    networks:
+      - bridge
+    depends_on:
+      - app
+
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -27,18 +41,22 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
       - grafana_data:/var/lib/grafana
+    networks:
+      - bridge
+
   app:
     build: .
     container_name: app
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       DB_HOST: postgres
-      DB_PORT:  5432
+      DB_PORT: 5432
       DB_USER: swanhtetaungphyo
       DB_PASSWORD: swanhtet12
       DB_NAME: app_db
@@ -47,7 +65,20 @@ services:
       MODE: development
     ports:
       - "8080:8080"
+    networks:
+      - bridge
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
 
 volumes:
   postgres_data:
   grafana_data:
+
+networks:
+  bridge:
+    driver: bridge

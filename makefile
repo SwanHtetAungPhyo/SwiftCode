@@ -26,5 +26,8 @@ test:
 
 remove:
 	@docker rmi -r $(docker images -q)
+curl-load:
 .PHONY: run build
+
+
 
